@@ -15,11 +15,13 @@ export default function Contabil() {
     try {
       const url = `${baseUrl}/${encodeURIComponent(pasta)}`
       
-      // 🔐 COM AUTENTICAÇÃO
+      // 🔐 USANDO VITE_GITHUB_TOKEN (correto para React + Vite)
+      const token = import.meta.env.VITE_GITHUB_TOKEN
+      
       const resposta = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`
-        }
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {}
       })
       
       if (!resposta.ok) {

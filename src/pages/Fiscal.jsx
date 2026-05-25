@@ -8,7 +8,7 @@ export default function Fiscal() {
   const baseUrl = "https://api.github.com/repos/matheuselan1921-alt/conecthon/contents/public/docs/fiscal"
 
   // Lista de pastas do Fiscal
-  const pastas = ["solucoes", "instrucoes", "icms", "obrigacoes", "piscofins", "recuperacao", "tutoriais"]
+  const pastas = ["solucoes", "instrucoes", "ICMS", "Obrigações Acessórias", "PISCOFINS", "recuperacao", "tutoriais"]
 
   useEffect(() => {
     async function buscarTodasPastas() {

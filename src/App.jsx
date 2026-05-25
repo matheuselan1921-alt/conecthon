@@ -1,11 +1,20 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
+import { useState } from "react"
 import Dashboard from "./pages/Dashboard"
 import Contabil from "./pages/Contabil"
 import Fiscal from "./pages/Fiscal"
 import Pessoal from "./pages/Pessoal"
 import Sobre from "./pages/Sobre"
+import Login from "./pages/Login"
 
 function App() {
+  const [autenticado, setAutenticado] = useState(false)
+
+  // Se não estiver autenticado, mostra a tela de login
+  if (!autenticado) {
+    return <Login onLogin={setAutenticado} />
+  }
+
   const menuItems = [
     { nome: "🏠 Dashboard", rota: "/" },
     { nome: "📘 Contábil", rota: "/contabil" },
@@ -48,6 +57,14 @@ function App() {
               </Link>
             ))}
           </nav>
+
+          {/* Botão Sair */}
+          <button
+            onClick={() => setAutenticado(false)}
+            className="mt-10 w-full px-5 py-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition text-sm"
+          >
+            🔓 Sair
+          </button>
 
           {/* IA FUTURA */}
           <div className="mt-10 rounded-[28px] border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-transparent p-6">

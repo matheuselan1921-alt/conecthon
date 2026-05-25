@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import Busca from "../components/Busca"
 
 export default function Contabil() {
   const [solucoes, setSolucoes] = useState([])
@@ -20,7 +21,7 @@ export default function Contabil() {
         if (Array.isArray(dados)) {
           const pdfs = dados.filter(f => f.name.endsWith(".pdf"))
           setter(pdfs.map(pdf => ({
-            nome: pdf.name.replace(".pdf", ""),
+            nome: pdf.name.replace(".pdf", "").replace(/-/g, " "),
             link: pdf.download_url,
             tamanho: (pdf.size / 1024).toFixed(0) + " KB"
           })))
@@ -46,6 +47,15 @@ export default function Contabil() {
     return <div className="text-center text-orange-400 text-xl p-20">📚 Carregando documentos...</div>
   }
 
+  // Juntar todos os documentos para a busca global
+  const todosDocumentos = [
+    ...solucoes.map(doc => ({ ...doc, categoria: "Soluções de Consulta" })),
+    ...instrucoes.map(doc => ({ ...doc, categoria: "Instruções Normativas" })),
+    ...cpcs.map(doc => ({ ...doc, categoria: "CPCs" })),
+    ...procedimentos.map(doc => ({ ...doc, categoria: "Procedimentos Internos" })),
+    ...tutoriais.map(doc => ({ ...doc, categoria: "Tutoriais" }))
+  ]
+
   const grupos = [
     { titulo: "📄 Soluções de Consulta", descricao: "SC Cosit", arquivos: solucoes, vazio: "Nenhuma solução de consulta adicionada" },
     { titulo: "📋 Instruções Normativas", descricao: "IN RFB", arquivos: instrucoes, vazio: "Nenhuma instrução normativa adicionada" },
@@ -67,6 +77,9 @@ export default function Contabil() {
           </div>
         </div>
       </div>
+
+      {/* 🔍 BARRA DE BUSCA INTELIGENTE */}
+      <Busca documentos={todosDocumentos} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {grupos.map((grupo, idx) => (

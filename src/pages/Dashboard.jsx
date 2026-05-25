@@ -9,70 +9,40 @@ export default function Dashboard() {
 
   const baseUrl = "https://api.github.com/repos/matheuselan1921-alt/conecthon/contents/public/docs"
 
-  // Função para buscar arquivos recursivamente dentro de uma pasta
-  async function buscarArquivosNaPasta(pasta) {
-    try {
-      const url = `${baseUrl}/${pasta}`
-      const resposta = await fetch(url)
-      
-      if (!resposta.ok) return []
-      
-      const dados = await resposta.json()
-      if (!Array.isArray(dados)) return []
-      
-      let todosArquivos = []
-      
-      for (const item of dados) {
-        if (item.type === "file" && item.name !== ".gitkeep") {
-          // É um arquivo direto
-          todosArquivos.push({
-            nome: item.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
-            link: item.download_url,
-            tamanho: (item.size / 1024).toFixed(0) + " KB"
-          })
-        } else if (item.type === "dir") {
-          // É uma pasta - busca arquivos dentro dela
-          const subUrl = `${url}/${encodeURIComponent(item.name)}`
-          const subResposta = await fetch(subUrl)
-          if (subResposta.ok) {
-            const subDados = await subResposta.json()
-            if (Array.isArray(subDados)) {
-              for (const subItem of subDados) {
-                if (subItem.type === "file" && subItem.name !== ".gitkeep") {
-                  todosArquivos.push({
-                    nome: subItem.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
-                    link: subItem.download_url,
-                    tamanho: (subItem.size / 1024).toFixed(0) + " KB"
-                  })
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      return todosArquivos
-    } catch (erro) {
-      console.error(`Erro ao buscar ${pasta}:`, erro)
-      return []
-    }
-  }
-
   useEffect(() => {
-    async function buscarTodosDocumentos() {
-      const [contabil, fiscal, pessoal] = await Promise.all([
-        buscarArquivosNaPasta("contabil"),
-        buscarArquivosNaPasta("fiscal"),
-        buscarArquivosNaPasta("pessoal")
-      ])
-      
-      setDocumentosContabil(contabil)
-      setDocumentosFiscal(fiscal)
-      setDocumentosPessoal(pessoal)
-      setCarregandoBusca(false)
+    async function buscarPDFs(pasta, setter) {
+      try {
+        const url = `${baseUrl}/${pasta}/solucoes`
+        const resposta = await fetch(url)
+        
+        if (!resposta.ok) {
+          setter([])
+          return
+        }
+        
+        const dados = await resposta.json()
+        
+        if (Array.isArray(dados)) {
+          const arquivos = dados.filter(f => f.name !== ".gitkeep")
+          setter(arquivos.map(arquivo => ({
+            nome: arquivo.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
+            link: arquivo.download_url,
+            tamanho: (arquivo.size / 1024).toFixed(0) + " KB"
+          })))
+        } else {
+          setter([])
+        }
+      } catch (erro) {
+        console.error(`Erro ao buscar ${pasta}:`, erro)
+        setter([])
+      }
     }
 
-    buscarTodosDocumentos()
+    Promise.all([
+      buscarPDFs("contabil", setDocumentosContabil),
+      buscarPDFs("fiscal", setDocumentosFiscal),
+      buscarPDFs("pessoal", setDocumentosPessoal)
+    ]).finally(() => setCarregandoBusca(false))
   }, [])
 
   const todosDocumentos = [...documentosContabil, ...documentosFiscal, ...documentosPessoal]
@@ -166,16 +136,7 @@ export default function Dashboard() {
               
               {/* Mensagem profissional */}
               <div className="mt-6 pt-4 border-t border-orange-500/10">
-                <div className="flex justify-between text-xs text-zinc-500 mb-2">
-                  <span>📊 Status atual</span>
-                  <span className="text-orange-400">{totalDocs} documentos no total</span>
-                </div>
-                <div className="text-xs text-zinc-600 space-y-1">
-                  <p>📘 Contábil: {documentosContabil.length} documentos</p>
-                  <p>📗 Fiscal: {documentosFiscal.length} documentos</p>
-                  <p>📙 Pessoal: {documentosPessoal.length} documentos</p>
-                </div>
-                <div className="mt-4 p-3 bg-orange-500/5 rounded-xl border border-orange-500/10">
+                <div className="p-3 bg-orange-500/5 rounded-xl border border-orange-500/10">
                   <p className="text-orange-400 text-sm font-medium text-center">
                     📚 Base de conhecimento em construção
                   </p>

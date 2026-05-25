@@ -39,9 +39,10 @@ function App() {
             <div className="w-16 h-16 rounded-[22px] bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center shadow-[0_0_40px_rgba(255,115,0,0.5)]">
               <span className="text-3xl font-black">C</span>
             </div>
-            <h1 className="text-4xl font-black mt-6 tracking-tight">
-              CONEC<span className="text-orange-500">THON</span>
-            </h1>
+<h1 className="text-4xl font-black mt-6 tracking-tight">
+  <span className="text-white">CONEC</span>
+  <span className="text-orange-500">THON</span>
+</h1>
             <p className="text-zinc-500 mt-2">Hub Contábil Inteligente</p>
           </div>
 

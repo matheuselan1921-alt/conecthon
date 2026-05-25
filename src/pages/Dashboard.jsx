@@ -9,38 +9,74 @@ export default function Dashboard() {
 
   const baseUrl = "https://api.github.com/repos/matheuselan1921-alt/conecthon/contents/public/docs"
 
-  useEffect(() => {
-    async function buscarPDFs(pasta, departamento, setter) {
-      try {
-        const url = `${baseUrl}/${pasta}/solucoes`
-        const resposta = await fetch(url)
-        const dados = await resposta.json()
-        
-        if (Array.isArray(dados)) {
-          const pdfs = dados.filter(f => f.name.endsWith(".pdf"))
-          setter(pdfs.map(pdf => ({
-            nome: pdf.name.replace(".pdf", "").replace(/-/g, " "),
-            link: pdf.download_url,
-            tamanho: (pdf.size / 1024).toFixed(0) + " KB",
-            departamento: departamento
-          })))
-        } else {
-          setter([])
+  // Função para buscar arquivos recursivamente dentro de uma pasta
+  async function buscarArquivosNaPasta(pasta) {
+    try {
+      const url = `${baseUrl}/${pasta}`
+      const resposta = await fetch(url)
+      
+      if (!resposta.ok) return []
+      
+      const dados = await resposta.json()
+      if (!Array.isArray(dados)) return []
+      
+      let todosArquivos = []
+      
+      for (const item of dados) {
+        if (item.type === "file" && item.name !== ".gitkeep") {
+          // É um arquivo direto
+          todosArquivos.push({
+            nome: item.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
+            link: item.download_url,
+            tamanho: (item.size / 1024).toFixed(0) + " KB"
+          })
+        } else if (item.type === "dir") {
+          // É uma pasta - busca arquivos dentro dela
+          const subUrl = `${url}/${encodeURIComponent(item.name)}`
+          const subResposta = await fetch(subUrl)
+          if (subResposta.ok) {
+            const subDados = await subResposta.json()
+            if (Array.isArray(subDados)) {
+              for (const subItem of subDados) {
+                if (subItem.type === "file" && subItem.name !== ".gitkeep") {
+                  todosArquivos.push({
+                    nome: subItem.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
+                    link: subItem.download_url,
+                    tamanho: (subItem.size / 1024).toFixed(0) + " KB"
+                  })
+                }
+              }
+            }
+          }
         }
-      } catch (erro) {
-        console.error(`Erro ao buscar ${pasta}:`, erro)
-        setter([])
       }
+      
+      return todosArquivos
+    } catch (erro) {
+      console.error(`Erro ao buscar ${pasta}:`, erro)
+      return []
+    }
+  }
+
+  useEffect(() => {
+    async function buscarTodosDocumentos() {
+      const [contabil, fiscal, pessoal] = await Promise.all([
+        buscarArquivosNaPasta("contabil"),
+        buscarArquivosNaPasta("fiscal"),
+        buscarArquivosNaPasta("pessoal")
+      ])
+      
+      setDocumentosContabil(contabil)
+      setDocumentosFiscal(fiscal)
+      setDocumentosPessoal(pessoal)
+      setCarregandoBusca(false)
     }
 
-    Promise.all([
-      buscarPDFs("contabil", "📘 Contábil", setDocumentosContabil),
-      buscarPDFs("fiscal", "📗 Fiscal", setDocumentosFiscal),
-      buscarPDFs("pessoal", "📙 Pessoal", setDocumentosPessoal)
-    ]).finally(() => setCarregandoBusca(false))
+    buscarTodosDocumentos()
   }, [])
 
   const todosDocumentos = [...documentosContabil, ...documentosFiscal, ...documentosPessoal]
+  const totalDocs = todosDocumentos.length
 
   const departamentos = [
     {
@@ -65,8 +101,6 @@ export default function Dashboard() {
       docs: documentosPessoal.length
     },
   ]
-
-  const totalDocs = documentosContabil.length + documentosFiscal.length + documentosPessoal.length
 
   return (
     <div>
@@ -99,27 +133,52 @@ export default function Dashboard() {
             </p>
           </div>
 
+          {/* Card lateral DINÂMICO */}
           <div className="relative">
             <div className="rounded-[36px] border border-orange-500/20 bg-gradient-to-br from-zinc-900 to-black p-8 shadow-[0_0_60px_rgba(255,115,0,0.10)]">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-zinc-500 text-sm">Documentos disponíveis</p>
-                  <h3 className="text-3xl font-bold mt-2 text-orange-400">{totalDocs}+</h3>
+                  <h3 className="text-3xl font-bold mt-2 text-orange-400">{totalDocs}</h3>
                 </div>
                 <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-black text-2xl font-bold">
                   📚
                 </div>
               </div>
+              
               <div className="mt-6 space-y-3">
                 <div className="flex items-center gap-3 text-zinc-400 text-sm">
-                  <span>✅</span> Soluções de Consulta ({documentosContabil.length})
+                  <span>{documentosContabil.length > 0 ? "✅" : "⏳"}</span> 
+                  <span>Departamento Contábil: </span>
+                  <span className="text-orange-400 font-mono">{documentosContabil.length} documentos</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-sm">
-                  <span>⏳</span> Instruções Normativas (em breve)
+                  <span>{documentosFiscal.length > 0 ? "✅" : "⏳"}</span> 
+                  <span>Departamento Fiscal: </span>
+                  <span className="text-orange-400 font-mono">{documentosFiscal.length} documentos</span>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400 text-sm">
-                  <span>⏳</span> CPCs (em breve)
+                  <span>{documentosPessoal.length > 0 ? "✅" : "⏳"}</span> 
+                  <span>Departamento Pessoal: </span>
+                  <span className="text-orange-400 font-mono">{documentosPessoal.length} documentos</span>
                 </div>
+              </div>
+              
+              {/* Barra de progresso */}
+              <div className="mt-6 pt-4 border-t border-orange-500/10">
+                <div className="flex justify-between text-xs text-zinc-500 mb-1">
+                  <span>Cobertura de documentos</span>
+                  <span>{Math.min(Math.round((totalDocs / 50) * 100), 100)}%</span>
+                </div>
+                <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-orange-500 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min((totalDocs / 50) * 100, 100)}%` }}
+                  />
+                </div>
+                <p className="text-zinc-600 text-xs mt-3">
+                  {totalDocs === 0 ? '📭 Adicione documentos para começar' : '📈 Continue expandindo a base de conhecimento'}
+                </p>
               </div>
             </div>
           </div>

@@ -4,7 +4,7 @@ export default function Login({ onLogin }) {
   const [senha, setSenha] = useState("")
   const [erro, setErro] = useState("")
 
-  const senhaCorreta = "contagil2025"  // ← Altere para a senha que você quiser
+  const senhaCorreta = "contagil2025"
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -18,26 +18,24 @@ export default function Login({ onLogin }) {
 
   return (
     <div className="min-h-screen bg-[#040404] flex items-center justify-center p-4">
-      {/* Background Glow */}
       <div className="absolute top-[-300px] right-[-200px] w-[1000px] h-[1000px] bg-orange-500/35 rounded-full blur-[180px]" />
       <div className="absolute bottom-[-250px] left-[-200px] w-[850px] h-[850px] bg-orange-700/20 rounded-full blur-[170px]" />
 
-      {/* Card de Login */}
       <div className="relative z-10 w-full max-w-md">
         <div className="bg-zinc-950/90 border border-orange-500/20 rounded-2xl p-8 shadow-[0_0_60px_rgba(255,115,0,0.15)] backdrop-blur-sm">
           
-          {/* Logo */}
+          {/* Logo corrigido */}
           <div className="text-center mb-8">
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center shadow-[0_0_30px_rgba(255,115,0,0.5)] mx-auto">
               <span className="text-3xl font-black text-white">C</span>
             </div>
             <h1 className="text-3xl font-bold mt-4">
-              CONEC<span className="text-orange-500">THON</span>
+              <span className="text-white">CONEC</span>
+              <span className="text-orange-500">THON</span>
             </h1>
             <p className="text-zinc-500 text-sm mt-1">Hub Contábil Inteligente</p>
           </div>
 
-          {/* Formulário */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-zinc-400 text-sm mb-2">

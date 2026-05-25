@@ -164,21 +164,25 @@ export default function Dashboard() {
                 </div>
               </div>
               
-              {/* Barra de progresso */}
+              {/* Mensagem profissional */}
               <div className="mt-6 pt-4 border-t border-orange-500/10">
-                <div className="flex justify-between text-xs text-zinc-500 mb-1">
-                  <span>Cobertura de documentos</span>
-                  <span>{Math.min(Math.round((totalDocs / 50) * 100), 100)}%</span>
+                <div className="flex justify-between text-xs text-zinc-500 mb-2">
+                  <span>📊 Status atual</span>
+                  <span className="text-orange-400">{totalDocs} documentos no total</span>
                 </div>
-                <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className="bg-orange-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min((totalDocs / 50) * 100, 100)}%` }}
-                  />
+                <div className="text-xs text-zinc-600 space-y-1">
+                  <p>📘 Contábil: {documentosContabil.length} documentos</p>
+                  <p>📗 Fiscal: {documentosFiscal.length} documentos</p>
+                  <p>📙 Pessoal: {documentosPessoal.length} documentos</p>
                 </div>
-                <p className="text-zinc-600 text-xs mt-3">
-                  {totalDocs === 0 ? '📭 Adicione documentos para começar' : '📈 Continue expandindo a base de conhecimento'}
-                </p>
+                <div className="mt-4 p-3 bg-orange-500/5 rounded-xl border border-orange-500/10">
+                  <p className="text-orange-400 text-sm font-medium text-center">
+                    📚 Base de conhecimento em construção
+                  </p>
+                  <p className="text-zinc-500 text-xs text-center mt-1">
+                    Expansão contínua da biblioteca documental
+                  </p>
+                </div>
               </div>
             </div>
           </div>

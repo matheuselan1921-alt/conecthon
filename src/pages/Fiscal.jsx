@@ -14,10 +14,16 @@ export default function Fiscal() {
   async function buscarArquivosNaPasta(pasta) {
     try {
       const url = `${baseUrl}/${encodeURIComponent(pasta)}`
-      const resposta = await fetch(url)
+      
+      // 🔐 ADICIONA O TOKEN DE AUTENTICAÇÃO
+      const resposta = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`
+        }
+      })
       
       if (!resposta.ok) {
-        console.log(`Pasta ${pasta} não encontrada`)
+        console.log(`Pasta ${pasta} não encontrada (status: ${resposta.status})`)
         return []
       }
       

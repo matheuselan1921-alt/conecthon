@@ -17,18 +17,28 @@ export default function Contabil() {
       for (const pasta of pastas) {
         try {
           const url = `${baseUrl}/${pasta}`
-          const resposta = await fetch(url)
+          
+          // 🔐 ADICIONA O TOKEN DE AUTENTICAÇÃO
+          const resposta = await fetch(url, {
+            headers: {
+              'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`
+            }
+          })
+          
+          if (!resposta.ok) {
+            console.log(`Pasta ${pasta} não encontrada (status: ${resposta.status})`)
+            continue
+          }
+          
           const dados = await resposta.json()
           
           if (Array.isArray(dados)) {
-            // SEM FILTRO - mostra todos os arquivos (qualquer extensão)
-            const arquivos = dados.filter(f => f.name !== ".gitkeep") // só remove o .gitkeep
+            // Remove apenas o .gitkeep
+            const arquivos = dados.filter(f => f.name !== ".gitkeep")
             const documentosComPasta = arquivos.map(arquivo => {
-              // Pega a extensão do arquivo
               const extensao = arquivo.name.split('.').pop().toUpperCase()
               let icone = "📄"
               
-              // Define ícone baseado na extensão
               if (extensao === "PDF") icone = "📑"
               else if (extensao === "DOCX" || extensao === "DOC") icone = "📝"
               else if (extensao === "XLSX" || extensao === "XLS") icone = "📊"
@@ -49,7 +59,7 @@ export default function Contabil() {
             todosDocumentos.push(...documentosComPasta)
           }
         } catch (erro) {
-          console.log(`Pasta ${pasta} não encontrada ou vazia`)
+          console.log(`Erro ao buscar pasta ${pasta}:`, erro)
         }
       }
       
@@ -81,10 +91,7 @@ export default function Contabil() {
     return <div className="text-center text-orange-400 text-xl p-20">📚 Carregando documentos...</div>
   }
 
-  // Juntar todos os documentos para a busca
   const todosDocumentos = [...documentos]
-
-  // Total de documentos
   const totalDocumentos = documentos.length
 
   return (
@@ -102,10 +109,8 @@ export default function Contabil() {
         </div>
       </div>
 
-      {/* Busca */}
       <Busca documentos={todosDocumentos} />
 
-      {/* Cards por categoria */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {grupos.map((grupo, idx) => {
           const arquivos = documentosPorCategoria[grupo.chave] || []

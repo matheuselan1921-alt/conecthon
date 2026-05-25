@@ -36,10 +36,6 @@ export default function Dashboard() {
 
           {/* LEFT */}
           <div>
-            <span className="inline-flex px-5 py-2 rounded-full border border-orange-500/20 bg-orange-500/10 text-orange-400 text-sm tracking-wide">
-              Contagil Contabilidade
-            </span>
-
             <h1 className="text-7xl font-black mt-8 leading-[0.95]">
               Central de conhecimento
               <span className="text-orange-500"> da Contagil Contabilidade</span>
@@ -49,10 +45,6 @@ export default function Dashboard() {
               Normas, procedimentos, soluções de consulta e conhecimento técnico
               dos departamentos Contábil, Fiscal e Pessoal, centralizados em uma
               única plataforma interna.
-            </p>
-
-            <p className="text-zinc-500 text-sm mt-6">
-              🔍 Selecione um departamento abaixo para começar
             </p>
           </div>
 

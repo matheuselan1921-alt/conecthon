@@ -9,40 +9,70 @@ export default function Dashboard() {
 
   const baseUrl = "https://api.github.com/repos/matheuselan1921-alt/conecthon/contents/public/docs"
 
-  useEffect(() => {
-    async function buscarPDFs(pasta, setter) {
+  // Pastas de cada departamento
+  const pastasContabil = ["solucoes", "instrucoes", "cpcs", "procedimentos", "tutoriais"]
+  const pastasFiscal = ["ICMS", "Obrigações Acessórias", "PISCOFINS", "instrucoes", "recuperacao", "solucoes", "tutoriais"]
+  const pastasPessoal = ["solucoes", "instrucoes", "convencoes", "procedimentos", "tutoriais"]
+
+  // Função para buscar arquivos recursivamente em todas as pastas de um departamento
+  async function buscarArquivosDoDepartamento(departamento, pastas) {
+    const token = import.meta.env.VITE_GITHUB_TOKEN
+    let todosArquivos = []
+    
+    for (const pasta of pastas) {
       try {
-        const url = `${baseUrl}/${pasta}/solucoes`
-        const resposta = await fetch(url)
+        const url = `${baseUrl}/${departamento}/${encodeURIComponent(pasta)}`
+        
+        const resposta = await fetch(url, {
+          headers: token ? {
+            'Authorization': `Bearer ${token}`
+          } : {}
+        })
         
         if (!resposta.ok) {
-          setter([])
-          return
+          console.log(`Pasta ${departamento}/${pasta} não encontrada`)
+          continue
         }
         
         const dados = await resposta.json()
         
         if (Array.isArray(dados)) {
-          const arquivos = dados.filter(f => f.name !== ".gitkeep")
-          setter(arquivos.map(arquivo => ({
-            nome: arquivo.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
-            link: arquivo.download_url,
-            tamanho: (arquivo.size / 1024).toFixed(0) + " KB"
-          })))
-        } else {
-          setter([])
+          const arquivos = dados.filter(item => 
+            item.type === "file" && item.name !== ".gitkeep"
+          )
+          
+          arquivos.forEach(arquivo => {
+            todosArquivos.push({
+              nome: arquivo.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
+              link: arquivo.download_url,
+              tamanho: (arquivo.size / 1024).toFixed(0) + " KB",
+              departamento: departamento
+            })
+          })
         }
       } catch (erro) {
-        console.error(`Erro ao buscar ${pasta}:`, erro)
-        setter([])
+        console.log(`Erro ao buscar ${departamento}/${pasta}:`, erro)
       }
     }
+    
+    return todosArquivos
+  }
 
-    Promise.all([
-      buscarPDFs("contabil", setDocumentosContabil),
-      buscarPDFs("fiscal", setDocumentosFiscal),
-      buscarPDFs("pessoal", setDocumentosPessoal)
-    ]).finally(() => setCarregandoBusca(false))
+  useEffect(() => {
+    async function buscarTodosDocumentos() {
+      const [contabil, fiscal, pessoal] = await Promise.all([
+        buscarArquivosDoDepartamento("contabil", pastasContabil),
+        buscarArquivosDoDepartamento("fiscal", pastasFiscal),
+        buscarArquivosDoDepartamento("pessoal", pastasPessoal)
+      ])
+      
+      setDocumentosContabil(contabil)
+      setDocumentosFiscal(fiscal)
+      setDocumentosPessoal(pessoal)
+      setCarregandoBusca(false)
+    }
+
+    buscarTodosDocumentos()
   }, [])
 
   const todosDocumentos = [...documentosContabil, ...documentosFiscal, ...documentosPessoal]

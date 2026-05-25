@@ -7,77 +7,83 @@ export default function Contabil() {
 
   const baseUrl = "https://api.github.com/repos/matheuselan1921-alt/conecthon/contents/public/docs/contabil"
 
-  // Lista de pastas que queremos buscar
+  // Lista de pastas do Contábil
   const pastas = ["solucoes", "instrucoes", "cpcs", "procedimentos", "tutoriais"]
 
-  useEffect(() => {
-    async function buscarTodasPastas() {
-      const todosDocumentos = []
-
-      for (const pasta of pastas) {
-        try {
-          const url = `${baseUrl}/${pasta}`
-          
-          // 🔐 ADICIONA O TOKEN DE AUTENTICAÇÃO
-          const resposta = await fetch(url, {
-            headers: {
-              'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`
-            }
-          })
-          
-          if (!resposta.ok) {
-            console.log(`Pasta ${pasta} não encontrada (status: ${resposta.status})`)
-            continue
-          }
-          
-          const dados = await resposta.json()
-          
-          if (Array.isArray(dados)) {
-            // Remove apenas o .gitkeep
-            const arquivos = dados.filter(f => f.name !== ".gitkeep")
-            const documentosComPasta = arquivos.map(arquivo => {
-              const extensao = arquivo.name.split('.').pop().toUpperCase()
-              let icone = "📄"
-              
-              if (extensao === "PDF") icone = "📑"
-              else if (extensao === "DOCX" || extensao === "DOC") icone = "📝"
-              else if (extensao === "XLSX" || extensao === "XLS") icone = "📊"
-              else if (extensao === "TXT") icone = "📃"
-              else if (extensao === "PPTX" || extensao === "PPT") icone = "📽️"
-              else if (extensao === "JPG" || extensao === "PNG" || extensao === "JPEG") icone = "🖼️"
-              else if (extensao === "ZIP") icone = "🗜️"
-              
-              return {
-                nome: arquivo.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
-                link: arquivo.download_url,
-                tamanho: (arquivo.size / 1024).toFixed(0) + " KB",
-                categoria: pasta,
-                extensao: extensao,
-                icone: icone
-              }
-            })
-            todosDocumentos.push(...documentosComPasta)
-          }
-        } catch (erro) {
-          console.log(`Erro ao buscar pasta ${pasta}:`, erro)
+  // Função para buscar arquivos dentro de uma pasta
+  async function buscarArquivosNaPasta(pasta) {
+    try {
+      const url = `${baseUrl}/${encodeURIComponent(pasta)}`
+      
+      // 🔐 COM AUTENTICAÇÃO
+      const resposta = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`
         }
+      })
+      
+      if (!resposta.ok) {
+        console.log(`Pasta ${pasta} não encontrada (status: ${resposta.status})`)
+        return []
+      }
+      
+      const dados = await resposta.json()
+      
+      if (!Array.isArray(dados)) return []
+      
+      // Filtra apenas arquivos (não pastas) e remove .gitkeep
+      const arquivos = dados.filter(item => 
+        item.type === "file" && item.name !== ".gitkeep"
+      )
+      
+      return arquivos.map(arquivo => {
+        const extensao = arquivo.name.split('.').pop().toUpperCase()
+        let icone = "📄"
+        if (extensao === "PDF") icone = "📑"
+        else if (extensao === "DOCX" || extensao === "DOC") icone = "📝"
+        else if (extensao === "XLSX" || extensao === "XLS") icone = "📊"
+        else if (extensao === "TXT") icone = "📃"
+        else if (extensao === "PPTX" || extensao === "PPT") icone = "📽️"
+        else if (extensao === "JPG" || extensao === "PNG" || extensao === "JPEG") icone = "🖼️"
+        else if (extensao === "ZIP") icone = "🗜️"
+        
+        return {
+          nome: arquivo.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
+          link: arquivo.download_url,
+          tamanho: (arquivo.size / 1024).toFixed(0) + " KB",
+          categoria: pasta,
+          extensao: extensao,
+          icone: icone
+        }
+      })
+    } catch (erro) {
+      console.log(`Erro ao buscar arquivos em ${pasta}:`, erro)
+      return []
+    }
+  }
+
+  useEffect(() => {
+    async function buscarTodosArquivos() {
+      let todosDocumentos = []
+      
+      for (const pasta of pastas) {
+        const arquivos = await buscarArquivosNaPasta(pasta)
+        console.log(`Pasta ${pasta}: ${arquivos.length} arquivos encontrados`)
+        todosDocumentos = [...todosDocumentos, ...arquivos]
       }
       
       setDocumentos(todosDocumentos)
       setCarregando(false)
     }
 
-    buscarTodasPastas()
+    buscarTodosArquivos()
   }, [])
 
   // Agrupar documentos por categoria
-  const documentosPorCategoria = {
-    solucoes: documentos.filter(d => d.categoria === "solucoes"),
-    instrucoes: documentos.filter(d => d.categoria === "instrucoes"),
-    cpcs: documentos.filter(d => d.categoria === "cpcs"),
-    procedimentos: documentos.filter(d => d.categoria === "procedimentos"),
-    tutoriais: documentos.filter(d => d.categoria === "tutoriais")
-  }
+  const documentosPorCategoria = {}
+  pastas.forEach(pasta => {
+    documentosPorCategoria[pasta] = documentos.filter(d => d.categoria === pasta)
+  })
 
   const grupos = [
     { titulo: "📄 Soluções de Consulta", descricao: "SC Cosit", chave: "solucoes", vazio: "Nenhuma solução de consulta adicionada" },
@@ -91,7 +97,6 @@ export default function Contabil() {
     return <div className="text-center text-orange-400 text-xl p-20">📚 Carregando documentos...</div>
   }
 
-  const todosDocumentos = [...documentos]
   const totalDocumentos = documentos.length
 
   return (
@@ -109,7 +114,7 @@ export default function Contabil() {
         </div>
       </div>
 
-      <Busca documentos={todosDocumentos} />
+      <Busca documentos={documentos} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {grupos.map((grupo, idx) => {

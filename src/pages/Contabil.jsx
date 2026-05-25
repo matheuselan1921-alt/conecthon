@@ -1,60 +1,104 @@
 import { useState, useEffect } from "react"
 
 export default function Contabil() {
-  const [arquivos, setArquivos] = useState([])
+  const [solucoes, setSolucoes] = useState([])
+  const [instrucoes, setInstrucoes] = useState([])
+  const [cpcs, setCpcs] = useState([])
+  const [procedimentos, setProcedimentos] = useState([])
+  const [tutoriais, setTutoriais] = useState([])
   const [carregando, setCarregando] = useState(true)
 
+  const baseUrl = "https://api.github.com/repos/matheuselan1921-alt/conecthon/contents/public/docs/contabil"
+
   useEffect(() => {
-    async function buscarPDFs() {
+    async function buscarPDFs(pasta, setter) {
       try {
-        const url = "https://api.github.com/repos/matheuselan1921-alt/conecthon/contents/public/docs/contabil/solucoes"
+        const url = `${baseUrl}/${pasta}`
         const resposta = await fetch(url)
         const dados = await resposta.json()
         
         if (Array.isArray(dados)) {
           const pdfs = dados.filter(f => f.name.endsWith(".pdf"))
-          setArquivos(pdfs)
+          setter(pdfs.map(pdf => ({
+            nome: pdf.name.replace(".pdf", ""),
+            link: pdf.download_url,
+            tamanho: (pdf.size / 1024).toFixed(0) + " KB"
+          })))
+        } else {
+          setter([])
         }
-        setCarregando(false)
       } catch (erro) {
-        console.error("Erro:", erro)
-        setCarregando(false)
+        console.error(`Erro ao buscar ${pasta}:`, erro)
+        setter([])
       }
     }
-    buscarPDFs()
+
+    Promise.all([
+      buscarPDFs("solucoes", setSolucoes),
+      buscarPDFs("instrucoes", setInstrucoes),
+      buscarPDFs("cpcs", setCpcs),
+      buscarPDFs("procedimentos", setProcedimentos),
+      buscarPDFs("tutoriais", setTutoriais)
+    ]).finally(() => setCarregando(false))
   }, [])
 
   if (carregando) {
     return <div className="text-center text-orange-400 text-xl p-20">📚 Carregando documentos...</div>
   }
 
+  const grupos = [
+    { titulo: "📄 Soluções de Consulta", descricao: "SC Cosit", arquivos: solucoes, vazio: "Nenhuma solução de consulta adicionada" },
+    { titulo: "📋 Instruções Normativas", descricao: "IN RFB", arquivos: instrucoes, vazio: "Nenhuma instrução normativa adicionada" },
+    { titulo: "⚖️ CPCs", descricao: "Comitê de Pronunciamentos Contábeis", arquivos: cpcs, vazio: "Nenhum CPC adicionado" },
+    { titulo: "📁 Procedimentos Internos", descricao: "Rotinas do escritório", arquivos: procedimentos, vazio: "Nenhum procedimento interno adicionado" },
+    { titulo: "🎓 Tutoriais Domínio", descricao: "Passo a passos e treinamentos", arquivos: tutoriais, vazio: "Nenhum tutorial adicionado" }
+  ]
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Departamento Contábil</h1>
-        <p className="text-zinc-400">Soluções de Consulta - SC Cosit</p>
+      <div className="mb-10">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center text-3xl">
+            📘
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold">Departamento Contábil</h1>
+            <p className="text-zinc-400 mt-1">Normas, procedimentos e materiais técnicos</p>
+          </div>
+        </div>
       </div>
 
-      {arquivos.length === 0 && (
-        <div className="text-center p-10 bg-zinc-900 rounded-xl">
-          <p className="text-zinc-400">Nenhum PDF encontrado</p>
-          <p className="text-zinc-500 text-sm mt-2">Verifique a pasta solucoes/ no GitHub</p>
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {grupos.map((grupo, idx) => (
+          <div key={idx} className="bg-zinc-950/80 border border-orange-500/10 rounded-2xl p-6 hover:border-orange-500/30 transition-all duration-300">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-xl font-bold">{grupo.titulo}</h3>
+                <p className="text-zinc-500 text-sm mt-1">{grupo.descricao}</p>
+              </div>
+              <span className="text-orange-500 text-sm font-mono">{grupo.arquivos.length} docs</span>
+            </div>
 
-      <div className="space-y-2">
-        {arquivos.map((pdf, idx) => (
-          <a
-            key={idx}
-            href={pdf.download_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg hover:bg-orange-500/20 transition border border-orange-500/10"
-          >
-            <span>📄</span>
-            <span className="flex-1">{pdf.name.replace(".pdf", "")}</span>
-            <span className="text-zinc-500 text-sm">{Math.round(pdf.size / 1024)} KB</span>
-          </a>
+            {grupo.arquivos.length > 0 && (
+              <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
+                {grupo.arquivos.map((doc, i) => (
+                  <a key={i} href={doc.link} target="_blank" rel="noopener noreferrer" 
+                     className="flex items-center justify-between text-sm text-zinc-400 hover:text-orange-400 transition p-2 rounded-lg hover:bg-orange-500/10">
+                    <span className="truncate flex-1">📄 {doc.nome}</span>
+                    <span className="text-zinc-500 text-xs ml-2">{doc.tamanho}</span>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {grupo.arquivos.length === 0 && (
+              <div className="mt-4 text-center py-6">
+                <div className="text-3xl mb-2">📭</div>
+                <p className="text-zinc-500 text-sm">{grupo.vazio}</p>
+                <p className="text-zinc-600 text-xs mt-2">Adicione PDFs na pasta <code className="text-orange-400">public/docs/contabil/{grupo.descricao.toLowerCase()}/</code></p>
+              </div>
+            )}
+          </div>
         ))}
       </div>
     </div>

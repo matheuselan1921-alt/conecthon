@@ -21,13 +21,31 @@ export default function Contabil() {
           const dados = await resposta.json()
           
           if (Array.isArray(dados)) {
-            const pdfs = dados.filter(f => f.name.endsWith(".pdf"))
-            const documentosComPasta = pdfs.map(pdf => ({
-              nome: pdf.name.replace(".pdf", "").replace(/-/g, " "),
-              link: pdf.download_url,
-              tamanho: (pdf.size / 1024).toFixed(0) + " KB",
-              categoria: pasta
-            }))
+            // SEM FILTRO - mostra todos os arquivos (qualquer extensão)
+            const arquivos = dados.filter(f => f.name !== ".gitkeep") // só remove o .gitkeep
+            const documentosComPasta = arquivos.map(arquivo => {
+              // Pega a extensão do arquivo
+              const extensao = arquivo.name.split('.').pop().toUpperCase()
+              let icone = "📄"
+              
+              // Define ícone baseado na extensão
+              if (extensao === "PDF") icone = "📑"
+              else if (extensao === "DOCX" || extensao === "DOC") icone = "📝"
+              else if (extensao === "XLSX" || extensao === "XLS") icone = "📊"
+              else if (extensao === "TXT") icone = "📃"
+              else if (extensao === "PPTX" || extensao === "PPT") icone = "📽️"
+              else if (extensao === "JPG" || extensao === "PNG" || extensao === "JPEG") icone = "🖼️"
+              else if (extensao === "ZIP") icone = "🗜️"
+              
+              return {
+                nome: arquivo.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
+                link: arquivo.download_url,
+                tamanho: (arquivo.size / 1024).toFixed(0) + " KB",
+                categoria: pasta,
+                extensao: extensao,
+                icone: icone
+              }
+            })
             todosDocumentos.push(...documentosComPasta)
           }
         } catch (erro) {
@@ -66,6 +84,9 @@ export default function Contabil() {
   // Juntar todos os documentos para a busca
   const todosDocumentos = [...documentos]
 
+  // Total de documentos
+  const totalDocumentos = documentos.length
+
   return (
     <div>
       <div className="mb-10">
@@ -76,6 +97,7 @@ export default function Contabil() {
           <div>
             <h1 className="text-4xl font-bold">Departamento Contábil</h1>
             <p className="text-zinc-400 mt-1">Normas, procedimentos e materiais técnicos</p>
+            <p className="text-orange-400 text-sm mt-1">{totalDocumentos} documentos no total</p>
           </div>
         </div>
       </div>
@@ -103,8 +125,11 @@ export default function Contabil() {
                   {arquivos.map((doc, i) => (
                     <a key={i} href={doc.link} target="_blank" rel="noopener noreferrer" 
                        className="flex items-center justify-between text-sm text-zinc-400 hover:text-orange-400 transition p-2 rounded-lg hover:bg-orange-500/10">
-                      <span className="truncate flex-1">📄 {doc.nome}</span>
-                      <span className="text-zinc-500 text-xs ml-2">{doc.tamanho}</span>
+                      <span className="truncate flex-1">{doc.icone} {doc.nome}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-zinc-600 text-xs">{doc.extensao}</span>
+                        <span className="text-zinc-500 text-xs ml-2">{doc.tamanho}</span>
+                      </div>
                     </a>
                   ))}
                 </div>
@@ -114,7 +139,7 @@ export default function Contabil() {
                 <div className="mt-4 text-center py-6">
                   <div className="text-3xl mb-2">📭</div>
                   <p className="text-zinc-500 text-sm">{grupo.vazio}</p>
-                  <p className="text-zinc-600 text-xs mt-2">Adicione PDFs na pasta <code className="text-orange-400">public/docs/contabil/{grupo.chave}/</code></p>
+                  <p className="text-zinc-600 text-xs mt-2">Adicione arquivos na pasta <code className="text-orange-400">public/docs/contabil/{grupo.chave}/</code></p>
                 </div>
               )}
             </div>

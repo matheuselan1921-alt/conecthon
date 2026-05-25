@@ -8,62 +8,77 @@ export default function Fiscal() {
   const baseUrl = "https://api.github.com/repos/matheuselan1921-alt/conecthon/contents/public/docs/fiscal"
 
   // Lista de pastas do Fiscal
-  const pastas = ["solucoes", "instrucoes", "ICMS", "Obrigações Acessórias", "PISCOFINS", "recuperacao", "tutoriais"]
+  const pastas = ["ICMS", "Obrigações Acessórias", "PISCOFINS", "instrucoes", "recuperacao", "solucoes", "tutoriais"]
+
+  // Função para buscar arquivos dentro de uma pasta
+  async function buscarArquivosNaPasta(pasta) {
+    try {
+      const url = `${baseUrl}/${encodeURIComponent(pasta)}`
+      const resposta = await fetch(url)
+      
+      if (!resposta.ok) {
+        console.log(`Pasta ${pasta} não encontrada`)
+        return []
+      }
+      
+      const dados = await resposta.json()
+      
+      if (!Array.isArray(dados)) return []
+      
+      // Filtra apenas arquivos (não pastas) e remove .gitkeep
+      const arquivos = dados.filter(item => 
+        item.type === "file" && item.name !== ".gitkeep"
+      )
+      
+      return arquivos.map(arquivo => {
+        const extensao = arquivo.name.split('.').pop().toUpperCase()
+        let icone = "📄"
+        if (extensao === "PDF") icone = "📑"
+        else if (extensao === "DOCX" || extensao === "DOC") icone = "📝"
+        else if (extensao === "XLSX" || extensao === "XLS") icone = "📊"
+        else if (extensao === "TXT") icone = "📃"
+        else if (extensao === "PPTX" || extensao === "PPT") icone = "📽️"
+        
+        return {
+          nome: arquivo.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
+          link: arquivo.download_url,
+          tamanho: (arquivo.size / 1024).toFixed(0) + " KB",
+          categoria: pasta,
+          extensao: extensao,
+          icone: icone
+        }
+      })
+    } catch (erro) {
+      console.log(`Erro ao buscar arquivos em ${pasta}:`, erro)
+      return []
+    }
+  }
 
   useEffect(() => {
-    async function buscarTodasPastas() {
-      const todosDocumentos = []
-
+    async function buscarTodosArquivos() {
+      let todosDocumentos = []
+      
       for (const pasta of pastas) {
-        try {
-          const url = `${baseUrl}/${pasta}`
-          const resposta = await fetch(url)
-          const dados = await resposta.json()
-          
-          if (Array.isArray(dados)) {
-            // Remove apenas o .gitkeep
-            const arquivos = dados.filter(f => f.name !== ".gitkeep")
-            const documentosComPasta = arquivos.map(arquivo => {
-              const extensao = arquivo.name.split('.').pop().toUpperCase()
-              let icone = "📄"
-              
-              if (extensao === "PDF") icone = "📑"
-              else if (extensao === "DOCX" || extensao === "DOC") icone = "📝"
-              else if (extensao === "XLSX" || extensao === "XLS") icone = "📊"
-              else if (extensao === "TXT") icone = "📃"
-              else if (extensao === "PPTX" || extensao === "PPT") icone = "📽️"
-              
-              return {
-                nome: arquivo.name.replace(/\.[^/.]+$/, "").replace(/-/g, " "),
-                link: arquivo.download_url,
-                tamanho: (arquivo.size / 1024).toFixed(0) + " KB",
-                categoria: pasta,
-                extensao: extensao,
-                icone: icone
-              }
-            })
-            todosDocumentos.push(...documentosComPasta)
-          }
-        } catch (erro) {
-          console.log(`Pasta ${pasta} não encontrada ou vazia`)
-        }
+        const arquivos = await buscarArquivosNaPasta(pasta)
+        console.log(`Pasta ${pasta}: ${arquivos.length} arquivos encontrados`)
+        todosDocumentos = [...todosDocumentos, ...arquivos]
       }
       
       setDocumentos(todosDocumentos)
       setCarregando(false)
     }
 
-    buscarTodasPastas()
+    buscarTodosArquivos()
   }, [])
 
   // Mapeamento das pastas para exibição
   const pastasConfig = [
-    { titulo: "📄 Soluções de Consulta", descricao: "SC Cosit Fiscal", chave: "solucoes", vazio: "Nenhuma solução de consulta adicionada" },
+    { titulo: "💰 ICMS", descricao: "Imposto sobre Circulação de Mercadorias", chave: "ICMS", vazio: "Nenhum documento de ICMS adicionado" },
+    { titulo: "📑 Obrigações Acessórias", descricao: "EFD, SPED, etc", chave: "Obrigações Acessórias", vazio: "Nenhuma obrigação acessória adicionada" },
+    { titulo: "🏦 PIS/COFINS", descricao: "Contribuições sociais", chave: "PISCOFINS", vazio: "Nenhum documento de PIS/COFINS adicionado" },
     { titulo: "📋 Instruções Normativas", descricao: "IN RFB", chave: "instrucoes", vazio: "Nenhuma instrução normativa adicionada" },
-    { titulo: "💰 ICMS", descricao: "Imposto sobre Circulação de Mercadorias", chave: "icms", vazio: "Nenhum documento de ICMS adicionado" },
-    { titulo: "📑 Obrigações Acessórias", descricao: "EFD, SPED, etc", chave: "obrigacoes", vazio: "Nenhuma obrigação acessória adicionada" },
-    { titulo: "🏦 PIS/COFINS", descricao: "Contribuições sociais", chave: "piscofins", vazio: "Nenhum documento de PIS/COFINS adicionado" },
     { titulo: "🔄 Recuperação Tributária", descricao: "Créditos e restituições", chave: "recuperacao", vazio: "Nenhum documento de recuperação tributária adicionado" },
+    { titulo: "📄 Soluções de Consulta", descricao: "SC Cosit Fiscal", chave: "solucoes", vazio: "Nenhuma solução de consulta adicionada" },
     { titulo: "🎓 Tutoriais Domínio", descricao: "Passo a passos fiscais", chave: "tutoriais", vazio: "Nenhum tutorial adicionado" }
   ]
 

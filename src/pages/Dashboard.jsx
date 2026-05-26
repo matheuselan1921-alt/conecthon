@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import BuscaGlobal from "../components/BuscaGlobal"
+import ChatIA from "../components/ChatIA"
 
 export default function Dashboard() {
   const [documentosContabil, setDocumentosContabil] = useState([])
@@ -209,6 +210,9 @@ export default function Dashboard() {
           </a>
         ))}
       </section>
+
+      {/* CHAT IA */}
+      <ChatIA />
     </div>
   )
 }

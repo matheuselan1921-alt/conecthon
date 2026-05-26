@@ -12,7 +12,7 @@ export default function Sobre() {
             Sobre o <span className="text-orange-500">CONECTHON</span>
           </h1>
           <p className="text-zinc-400 text-xl mt-4 max-w-3xl mx-auto">
-            Centralização inteligente de conhecimento fiscal e contábil
+            Centralização inteligente de conhecimento fiscal e contábil com assistente IA
           </p>
         </div>
       </section>
@@ -45,7 +45,7 @@ export default function Sobre() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-orange-500">✓</span>
-              Upload automático de PDFs via GitHub
+              Assistente IA simulada para tirar dúvidas fiscais
             </li>
           </ul>
         </div>
@@ -70,57 +70,61 @@ export default function Sobre() {
               <span className="text-orange-500">⏱️</span>
               Consultas que levavam 5-10 minutos agora em segundos
             </li>
+            <li className="flex items-start gap-2">
+              <span className="text-orange-500">🤖</span>
+              Primeiros passos da IA com respostas automáticas
+            </li>
           </ul>
         </div>
       </div>
 
-      {/* PRÓXIMOS PASSOS - FUTURO */}
+      {/* PRÓXIMOS PASSOS - FUTURO COM IA */}
       <div className="bg-gradient-to-r from-orange-500/10 to-transparent border border-orange-500/20 rounded-2xl p-8 mb-10">
-        <h2 className="text-2xl font-bold mb-6">🚀 Próximos passos (visão de futuro)</h2>
+        <h2 className="text-2xl font-bold mb-6">🚀 Próximos passos (expansão com IA)</h2>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="flex gap-3 items-start">
-              <span className="text-orange-400 text-xl">🤖</span>
+              <span className="text-orange-400 text-xl">🧮</span>
               <div>
-                <h3 className="font-bold text-white">Assistente IA</h3>
-                <p className="text-zinc-500 text-sm">Responder dúvidas sobre normas em linguagem natural</p>
+                <h3 className="font-bold text-white">Calculadora da Reforma Tributária</h3>
+                <p className="text-zinc-500 text-sm">Simule impactos da nova tributária sobre IBS e CBS no seu negócio</p>
               </div>
             </div>
             <div className="flex gap-3 items-start">
-              <span className="text-orange-400 text-xl">📊</span>
+              <span className="text-orange-400 text-xl">💰</span>
               <div>
-                <h3 className="font-bold text-white">Análise automática de cenários</h3>
-                <p className="text-zinc-500 text-sm">Simular impactos tributários (ICMS, PIS/COFINS)</p>
+                <h3 className="font-bold text-white">Calculadora de Juros sobre Mútuo</h3>
+                <p className="text-zinc-500 text-sm">Cálculo automático de juros em contratos de mútuo entre empresas</p>
               </div>
             </div>
             <div className="flex gap-3 items-start">
-              <span className="text-orange-400 text-xl">🔮</span>
+              <span className="text-orange-400 text-xl">📉</span>
               <div>
-                <h3 className="font-bold text-white">Projeção de reforma tributária</h3>
-                <p className="text-zinc-500 text-sm">Comparativo antes/depois das novas regras</p>
+                <h3 className="font-bold text-white">Controle de Depreciação Integrado</h3>
+                <p className="text-zinc-500 text-sm">Gestão completa da depreciação de ativos com cálculos automáticos</p>
               </div>
             </div>
           </div>
           <div className="space-y-4">
             <div className="flex gap-3 items-start">
-              <span className="text-orange-400 text-xl">📎</span>
+              <span className="text-orange-400 text-xl">❓</span>
               <div>
-                <h3 className="font-bold text-white">Busca dentro de PDFs</h3>
-                <p className="text-zinc-500 text-sm">Localizar trechos específicos de normas automaticamente</p>
+                <h3 className="font-bold text-white">FAQ Reforma Tributária</h3>
+                <p className="text-zinc-500 text-sm">Base de conhecimento com perguntas frequentes sobre a nova legislação</p>
               </div>
             </div>
             <div className="flex gap-3 items-start">
-              <span className="text-orange-400 text-xl">🔄</span>
+              <span className="text-orange-400 text-xl">📋</span>
               <div>
-                <h3 className="font-bold text-white">Integração com sistemas</h3>
-                <p className="text-zinc-500 text-sm">Conectar com ERPs e sistemas contábeis</p>
+                <h3 className="font-bold text-white">Registro de Parcelamentos de Clientes</h3>
+                <p className="text-zinc-500 text-sm">Controle centralizado de acordos e parcelamentos fiscais</p>
               </div>
             </div>
             <div className="flex gap-3 items-start">
-              <span className="text-orange-400 text-xl">📱</span>
+              <span className="text-orange-400 text-xl">📢</span>
               <div>
-                <h3 className="font-bold text-white">Aplicativo mobile</h3>
-                <p className="text-zinc-500 text-sm">Consultas direto do celular no campo</p>
+                <h3 className="font-bold text-white">Busca automática de leis + Bot de notificações</h3>
+                <p className="text-zinc-500 text-sm">Monitoramento de atualizações normativas e alertas em tempo real</p>
               </div>
             </div>
           </div>
@@ -144,8 +148,8 @@ export default function Sobre() {
           <h3 className="text-2xl font-bold text-orange-400 mb-3">Solução</h3>
           <p className="text-zinc-400 leading-relaxed">
             Centralização de normas, procedimentos e conhecimento técnico
-            em um ambiente digital acessível, com busca inteligente e
-            organização por departamentos.
+            em um ambiente digital acessível, com busca inteligente,
+            assistente IA e ferramentas de cálculo integradas.
           </p>
         </div>
 
@@ -154,7 +158,7 @@ export default function Sobre() {
           <h3 className="text-2xl font-bold text-green-400 mb-3">Resultado</h3>
           <p className="text-zinc-400 leading-relaxed">
             Redução de 70% no tempo de análise tributária, padronização de
-            procedimentos e segurança da informação centralizada.
+            procedimentos, segurança da informação e automação de cálculos.
           </p>
         </div>
       </div>
@@ -174,8 +178,8 @@ export default function Sobre() {
           <p className="text-zinc-500 text-sm mt-2">Disponibilidade<br />na nuvem</p>
         </div>
         <div className="bg-zinc-950/50 border border-orange-500/10 rounded-2xl p-6">
-          <div className="text-3xl font-bold text-orange-500">3</div>
-          <p className="text-zinc-500 text-sm mt-2">Departamentos<br />integrados</p>
+          <div className="text-3xl font-bold text-orange-500">🤖</div>
+          <p className="text-zinc-500 text-sm mt-2">Assistente IA<br />em operação</p>
         </div>
       </div>
 
@@ -189,6 +193,7 @@ export default function Sobre() {
           <span className="px-3 py-1 bg-zinc-900 rounded-full text-xs text-orange-400">GitHub API</span>
           <span className="px-3 py-1 bg-zinc-900 rounded-full text-xs text-orange-400">Fuse.js</span>
           <span className="px-3 py-1 bg-zinc-900 rounded-full text-xs text-orange-400">Vercel</span>
+          <span className="px-3 py-1 bg-zinc-900 rounded-full text-xs text-orange-400">IA Assistente</span>
         </div>
       </div>
     </div>

@@ -5,11 +5,21 @@ export default function ChatIA() {
   const [respostas, setRespostas] = useState([])
   const [chatAberto, setChatAberto] = useState(false)
 
-  // Pergunta que a IA "sabe" responder
-  const perguntaConhecida = "Você poderia fazer uma simulaçãoCom a reforma tributária, como vão ficar os créditos tributários da minha empresa? Vou conseguir aproveitar mais ou menos créditos?"
-  const respostaConhecida = "Em muitos casos, a tendência é que as empresas consigam aproveitar mais créditos tributários, mas isso depende muito do setor, da estrutura de custos e do regime tributário, qual o setor da sua empresa?"
-  const perguntaConhecida = "Supermercado"
-  const respostaConhecida = "Se for supermercado, a tendência é que o cenário seja mais favorável para aproveitamento de créditos, comparado a muitos outros setores — mas com alguns pontos de atenção. O motivo é simples: supermercado tem uma cadeia forte de compras tributadas. Você compra mercadorias, embalagens, energia, fretes, serviços, manutenção, equipamentos, entre outros custos que tendem a gerar crédito no modelo de IBS/CBS."
+  // Array de perguntas e respostas conhecidas
+  const perguntasRespostas = [
+    {
+      pergunta: "o que é icms",
+      resposta: "ICMS é o Imposto sobre Circulação de Mercadorias e Serviços, de competência estadual. Ele incide sobre operações de circulação de mercadorias, transporte interestadual e intermunicipal, comunicação e energia elétrica. A alíquota varia conforme o estado e a operação."
+    },
+    {
+      pergunta: "com a reforma tributária, como vão ficar os créditos tributários da minha empresa? vou conseguir aproveitar mais ou menos créditos",
+      resposta: "Em muitos casos, a tendência é que as empresas consigam aproveitar mais créditos tributários, mas isso depende muito do setor, da estrutura de custos e do regime tributário. Qual o setor da sua empresa?"
+    },
+    {
+      pergunta: "supermercado",
+      resposta: "Se for supermercado, a tendência é que o cenário seja mais favorável para aproveitamento de créditos, comparado a muitos outros setores — mas com alguns pontos de atenção. O motivo é simples: supermercado tem uma cadeia forte de compras tributadas. Você compra mercadorias, embalagens, energia, fretes, serviços, manutenção, equipamentos, entre outros custos que tendem a gerar crédito no modelo de IBS/CBS."
+    }
+  ]
 
   const handleEnviar = (e) => {
     e.preventDefault()
@@ -18,9 +28,13 @@ export default function ChatIA() {
     const perguntaUsuario = mensagem.toLowerCase().trim()
     let respostaIA = ""
 
-    // Verifica se a pergunta é a conhecida
-    if (perguntaUsuario.includes(perguntaConhecida) || perguntaUsuario === perguntaConhecida) {
-      respostaIA = respostaConhecida
+    // Procura a pergunta no array
+    const encontrada = perguntasRespostas.find(item => 
+      perguntaUsuario.includes(item.pergunta) || item.pergunta.includes(perguntaUsuario)
+    )
+
+    if (encontrada) {
+      respostaIA = encontrada.resposta
     } else {
       respostaIA = "📚 Ainda estou aprendendo sobre este assunto. Em breve, o assistente IA estará treinado para responder todas as dúvidas sobre normas fiscais, tributárias e trabalhistas. Por enquanto, consulte a base de documentos do CONECTHON."
     }
@@ -63,7 +77,7 @@ export default function ChatIA() {
             <div className="flex gap-2">
               <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-sm">🤖</div>
               <div className="flex-1 bg-zinc-900 rounded-xl p-3 text-sm text-zinc-300">
-                Olá! Sou o assistente IA do CONECTHON. Pergunte-me sobre <span className="text-orange-400 font-medium">"O que é ICMS?"</span> para um exemplo. Outras perguntas serão registradas para meu treinamento futuro.
+                Olá! Sou o assistente IA do CONECTHON. Posso responder perguntas sobre <span className="text-orange-400 font-medium">ICMS</span> e <span className="text-orange-400 font-medium">Reforma Tributária</span>. Pergunte-me algo!
               </div>
             </div>
 

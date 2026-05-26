@@ -6,8 +6,10 @@ export default function ChatIA() {
   const [chatAberto, setChatAberto] = useState(false)
 
   // Pergunta que a IA "sabe" responder
-  const perguntaConhecida = "o que é icms"
-  const respostaConhecida = "ICMS é o Imposto sobre Circulação de Mercadorias e Serviços, de competência estadual. Ele incide sobre operações de circulação de mercadorias, transporte interestadual e intermunicipal, comunicação e energia elétrica. A alíquota varia conforme o estado e a operação."
+  const perguntaConhecida = "Você poderia fazer uma simulaçãoCom a reforma tributária, como vão ficar os créditos tributários da minha empresa? Vou conseguir aproveitar mais ou menos créditos?"
+  const respostaConhecida = "Em muitos casos, a tendência é que as empresas consigam aproveitar mais créditos tributários, mas isso depende muito do setor, da estrutura de custos e do regime tributário, qual o setor da sua empresa?"
+  const perguntaConhecida = "Supermercado"
+  const respostaConhecida = "Se for supermercado, a tendência é que o cenário seja mais favorável para aproveitamento de créditos, comparado a muitos outros setores — mas com alguns pontos de atenção. O motivo é simples: supermercado tem uma cadeia forte de compras tributadas. Você compra mercadorias, embalagens, energia, fretes, serviços, manutenção, equipamentos, entre outros custos que tendem a gerar crédito no modelo de IBS/CBS."
 
   const handleEnviar = (e) => {
     e.preventDefault()
